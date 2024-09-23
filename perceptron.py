@@ -8,13 +8,18 @@ class Perceptron:
 
     def run(self, x):
         x_sum = np.dot(np.append(x, self.bias), self.weights)
-        return self.sigmoid(x_sum)
+        return self.activation_function(x_sum)
 
     def set_weights(self, weights):
         self.weights = np.array(weights, dtype=float)
 
-    def sigmoid(self, x):
+    @staticmethod
+    def activation_function(x):
         return 1 / (1 + np.exp(-x))
+
+    @staticmethod
+    def activation_function_rate(x):
+        return x * (1 - x)
 
 
 class NeuralNetwork:
@@ -68,7 +73,7 @@ class NeuralNetwork:
         error = y - output
         mse = sum(error ** 2) / self.layers[-1]
 
-        self.d[-1] = output * (1 - output) * error
+        self.d[-1] = Perceptron.activation_function_rate(output) * error
 
         for layer_index in reversed(range(len(self.network) - 1)):
             for neuron_index in range(len(self.network[layer_index])):
@@ -78,7 +83,7 @@ class NeuralNetwork:
                     nxt_layer_input_weight = self.network[layer_index + 1][nxt_layer_neuron_index].weights[neuron_index]
                     nxt_layer_neuron_error = self.d[layer_index + 1][nxt_layer_neuron_index]
                     fwd_error += nxt_layer_input_weight * nxt_layer_neuron_error
-                    self.d[layer_index][neuron_index] = neuron_output * (1 - neuron_output) * fwd_error
+                    self.d[layer_index][neuron_index] = Perceptron.activation_function_rate(neuron_output)  * fwd_error
 
         for layer_index in range(len(self.network)):
             for neuron_index in range(len(self.network[layer_index])):

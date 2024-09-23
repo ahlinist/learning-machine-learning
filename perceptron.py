@@ -18,11 +18,12 @@ class Perceptron:
 
 
 class NeuralNetwork:
-    def __init__(self, layers, eta=0.5):
+    def __init__(self, layers, eta=0.5, bias=1.0):
         self.layers = layers
         self.network = []
         self.values = []
         self.eta = eta
+        self.bias = bias
         self.d = []
 
         for layer in range(len(self.layers)):
@@ -37,7 +38,7 @@ class NeuralNetwork:
                     inputs_number = self.layers[layer]
                 else:
                     inputs_number = self.layers[layer] + 1  # +1 for bias
-                self.network[layer].append(Perceptron(inputs_number))
+                self.network[layer].append(Perceptron(inputs_number, self.bias))
 
     def set_weights(self, weights):
         for layer in range(len(self.layers)):
@@ -82,6 +83,6 @@ class NeuralNetwork:
         for layer_index in range(len(self.network)):
             for neuron_index in range(len(self.network[layer_index])):
                 input_vector = x if (layer_index == 0) else self.values[layer_index - 1]
-                correction = self.eta * self.d[layer_index][neuron_index] * np.append(input_vector, 1.0)
+                correction = self.eta * self.d[layer_index][neuron_index] * np.append(input_vector, self.bias)
                 self.network[layer_index][neuron_index].weights += correction
         return mse

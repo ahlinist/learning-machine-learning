@@ -2,7 +2,7 @@ from perceptron import Perceptron, NeuralNetwork
 
 
 def main():
-    network = NeuralNetwork(layers=[2, 1])
+    network = NeuralNetwork(inputs=2, layers=[2, 1])
 
     for i in range(3000):
         mse = 0.0

@@ -23,7 +23,7 @@ class Perceptron:
 
 
 class NeuralNetwork:
-    def __init__(self, layers, eta=0.5, bias=1.0):
+    def __init__(self, inputs, layers, eta=0.5, bias=1.0):
         self.layers = layers
         self.network = []
         self.values = []
@@ -40,9 +40,9 @@ class NeuralNetwork:
 
             for neuron in range(self.layers[layer]):
                 if layer == 0:
-                    inputs_number = self.layers[layer]
+                    inputs_number = inputs
                 else:
-                    inputs_number = self.layers[layer] + 1  # +1 for bias
+                    inputs_number = self.layers[layer - 1]
                 self.network[layer].append(Perceptron(inputs_number, self.bias))
 
     def set_weights(self, weights):

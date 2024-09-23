@@ -64,23 +64,20 @@ class NeuralNetwork:
         x = np.array(x, dtype=object)
         y = np.array(y, dtype=object)
         output = self.run(x)
-        error = output - y
+        error = y - output
         mse = sum(error ** 2) / self.layers[-1]
 
-        self.d[-1] = output * (1 - output) * error #to checkout with the course
+        self.d[-1] = output * (1 - output) * error
 
-        for layer_index in reversed(range(len(self.network))):
+        for layer_index in reversed(range(len(self.network) - 1)):
             for neuron_index in range(len(self.network[layer_index])):
                 fwd_error = 0.0
                 neuron_output = self.values[layer_index][neuron_index]
-                if layer_index == len(self.network) - 1:
-                    fwd_error += (y[neuron_index] - neuron_output)
-                else:
-                    for next_layer_neuron_index in range(len(self.network[layer_index + 1])):
-                        neuron_out_weight = self.network[layer_index + 1][next_layer_neuron_index].weights[neuron_index]
-                        next_layer_neuron_error = self.d[layer_index + 1][next_layer_neuron_index]
-                        fwd_error += neuron_out_weight * next_layer_neuron_error
-                self.d[layer_index][neuron_index] = neuron_output * (1 - neuron_output) * fwd_error
+                for next_layer_neuron_index in range(len(self.network[layer_index + 1])):
+                    neuron_out_weight = self.network[layer_index + 1][next_layer_neuron_index].weights[neuron_index]
+                    next_layer_neuron_error = self.d[layer_index + 1][next_layer_neuron_index]
+                    fwd_error += neuron_out_weight * next_layer_neuron_error
+                    self.d[layer_index][neuron_index] = neuron_output * (1 - neuron_output) * fwd_error
 
         for layer_index in range(len(self.network)):
             for neuron_index in range(len(self.network[layer_index])):

@@ -11,7 +11,7 @@ class Perceptron:
         return self.sigmoid(x_sum)
 
     def set_weights(self, weights):
-        self.weights = np.array(weights, dtype=object)
+        self.weights = np.array(weights, dtype=float)
 
     def sigmoid(self, x):
         return 1 / (1 + np.exp(-x))
@@ -29,8 +29,8 @@ class NeuralNetwork:
             self.values.append([])
             self.network.append([])
             self.d.append([])
-            self.values[layer] = np.zeros(self.layers[layer], dtype=object)
-            self.d[layer] = np.zeros(self.layers[layer], dtype=object)
+            self.values[layer] = np.zeros(self.layers[layer], dtype=float)
+            self.d[layer] = np.zeros(self.layers[layer], dtype=float)
 
             for neuron in range(self.layers[layer]):
                 if layer == 0:
@@ -61,8 +61,8 @@ class NeuralNetwork:
         return self.values[-1]
 
     def propagate_back(self, x, y):
-        x = np.array(x, dtype=object)
-        y = np.array(y, dtype=object)
+        x = np.array(x, dtype=float)
+        y = np.array(y, dtype=float)
         output = self.run(x)
         error = y - output
         mse = sum(error ** 2) / self.layers[-1]
@@ -81,9 +81,7 @@ class NeuralNetwork:
 
         for layer_index in range(len(self.network)):
             for neuron_index in range(len(self.network[layer_index])):
-                for weight_index in range(len(self.network[layer_index][neuron_index].weights)):
-                    input_vector = x if (layer_index == 0) else self.values[layer_index - 1]
-                    input_value = np.append(input_vector, 1)[weight_index]
-                    correction = self.eta * self.d[layer_index][neuron_index] * input_value
-                    self.network[layer_index][neuron_index].weights[weight_index] += correction
+                input_vector = x if (layer_index == 0) else self.values[layer_index - 1]
+                correction = self.eta * self.d[layer_index][neuron_index] * np.append(input_vector, 1.0)
+                self.network[layer_index][neuron_index].weights += correction
         return mse

@@ -17,8 +17,6 @@ def main():
 
     network.print_weights()
 
-    print(network.d)
-
     print('XOR gate trained:')
     print('0 0 = {0:.10f}'.format(network.run([0, 0])[0]))
     print('0 1 = {0:.10f}'.format(network.run([0, 1])[0]))

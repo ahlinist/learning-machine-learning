@@ -82,11 +82,8 @@ class NeuralNetwork:
         for layer_index in range(len(self.network)):
             for neuron_index in range(len(self.network[layer_index])):
                 for weight_index in range(len(self.network[layer_index][neuron_index].weights)):
-                    if layer_index == 0:
-                        input_value = np.append(x, 1)[weight_index]
-                        correction = self.eta * self.d[layer_index][neuron_index] * input_value
-                    else:
-                        input_value = np.append(self.values[layer_index - 1], 1)[weight_index]
-                        correction = self.eta * self.d[layer_index][neuron_index] * input_value
+                    input_vector = x if (layer_index == 0) else self.values[layer_index - 1]
+                    input_value = np.append(input_vector, 1)[weight_index]
+                    correction = self.eta * self.d[layer_index][neuron_index] * input_value
                     self.network[layer_index][neuron_index].weights[weight_index] += correction
         return mse

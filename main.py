@@ -1,8 +1,8 @@
-from perceptron import Perceptron, NeuralNetwork
+from perceptron import NeuralNetwork
 
 
 def main():
-    network = NeuralNetwork(inputs=2, layers=[2, 1])
+    network = NeuralNetwork(inputs=2, activation_function='sigmoid', layers=[2, 1])
 
     for i in range(3000):
         mse = 0.0

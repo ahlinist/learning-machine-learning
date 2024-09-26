@@ -2,34 +2,32 @@ import numpy as np
 
 
 class Perceptron:
-    def __init__(self, inputs, bias=1.0):
+    def __init__(self, inputs, activation_function, bias=1.0):
         self.weights = (np.random.rand(inputs + 1) * 2) - 1
         self.bias = bias
+        self.activation_function = activation_function
 
     def run(self, x):
         x_sum = np.dot(np.append(x, self.bias), self.weights)
-        return self.activation_function(x_sum)
+        return self.activation_function.map(x_sum)
 
     def set_weights(self, weights):
         self.weights = np.array(weights, dtype=float)
 
-    @staticmethod
-    def activation_function(x):
-        return 1 / (1 + np.exp(-x))
-
-    @staticmethod
-    def activation_function_rate(x):
-        return x * (1 - x)
-
 
 class NeuralNetwork:
-    def __init__(self, inputs, layers, eta=0.5, bias=1.0):
+    def __init__(self, inputs, layers, activation_function='linear', eta=0.5, bias=1.0):
         self.layers = layers
         self.network = []
         self.values = []
         self.eta = eta
         self.bias = bias
         self.d = []
+        match activation_function:
+            case 'linear':
+                self.activation_function = NeuralNetwork.LinearActivationFunction()
+            case 'sigmoid':
+                self.activation_function = NeuralNetwork.SigmoidActivationFunction()
 
         for layer in range(len(self.layers)):
             self.values.append([])
@@ -43,7 +41,7 @@ class NeuralNetwork:
                     inputs_number = inputs
                 else:
                     inputs_number = self.layers[layer - 1]
-                self.network[layer].append(Perceptron(inputs_number, self.bias))
+                self.network[layer].append(Perceptron(inputs_number, self.activation_function, self.bias))
 
     def set_weights(self, weights):
         for layer in range(len(self.layers)):
@@ -73,7 +71,7 @@ class NeuralNetwork:
         error = y - output
         mse = sum(error ** 2) / self.layers[-1]
 
-        self.d[-1] = Perceptron.activation_function_rate(output) * error
+        self.d[-1] = self.activation_function.derivative(output) * error
 
         for layer_index in reversed(range(len(self.network) - 1)):
             for neuron_index in range(len(self.network[layer_index])):
@@ -83,7 +81,7 @@ class NeuralNetwork:
                     nxt_layer_input_weight = self.network[layer_index + 1][nxt_layer_neuron_index].weights[neuron_index]
                     nxt_layer_neuron_error = self.d[layer_index + 1][nxt_layer_neuron_index]
                     fwd_error += nxt_layer_input_weight * nxt_layer_neuron_error
-                    self.d[layer_index][neuron_index] = Perceptron.activation_function_rate(neuron_output)  * fwd_error
+                    self.d[layer_index][neuron_index] = self.activation_function.derivative(neuron_output)  * fwd_error
 
         for layer_index in range(len(self.network)):
             for neuron_index in range(len(self.network[layer_index])):
@@ -91,3 +89,24 @@ class NeuralNetwork:
                 correction = self.eta * self.d[layer_index][neuron_index] * np.append(input_vector, self.bias)
                 self.network[layer_index][neuron_index].weights += correction
         return mse
+
+    class ActivationFunction:
+        def map(self, x):
+            pass
+
+        def derivative(self, x):
+            pass
+
+    class LinearActivationFunction(ActivationFunction):
+        def map(self, x):
+            return x
+
+        def derivative(self, x):
+            return 1
+
+    class SigmoidActivationFunction(ActivationFunction):
+        def map(self, x):
+            return 1 / (1 + np.exp(-x))
+
+        def derivative(self, x):
+            return x * (1 - x)
